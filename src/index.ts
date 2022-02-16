@@ -44,6 +44,7 @@ createConnection()
         const countsRepository = connection.getRepository(status_counts);
         const qIdArray = req.query.qId;
         let reqJson = [];
+        console.log("Test")
 
         const carvingDatas = [];
         for (let qIdArray_i = 0; qIdArray_i <= 9; qIdArray_i++) {
