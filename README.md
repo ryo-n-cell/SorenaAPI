@@ -43,15 +43,10 @@
 [issue](https://github.com/ryo-n-cell/aruaruSet/issues)  
 [Project](https://github.com/ryo-n-cell/aruaruSet/projects/1)
 
-# Build Setup
+# Awesome Project Build with TypeORM
 
-```bash
-# install dependencies
-$ yarn install
+Steps to run this project:
 
-# serve with hot reload at localhost:3000
-$ yarn dev
-
-# generate static project
-$ yarn generate
-```
+1. Run `npm i` command
+2. Setup database settings inside `ormconfig.json` file
+3. Run `npm start` command
