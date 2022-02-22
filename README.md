@@ -1,4 +1,4 @@
-# Sorena(FrontEnd)
+# Sorena(BackEnd)
 
 <p>
   <img alt="Sorena" src="https://github.com/ryo-n-cell/aruaruSet/blob/develop/assets/img/top_img/topPageCarousels/sorena_top.gif" width="50%" />
