@@ -2,13 +2,16 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToMany,
+  ManyToOne,
+  JoinColumn,
   Timestamp,
 } from "typeorm";
 
+import {question_table} from "./question_table";
+
 @Entity({ synchronize: false })
 export class status_counts {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('increment')
   id: number = 0;
 
   @Column()
@@ -16,6 +19,10 @@ export class status_counts {
 
   @Column()
   status: number = 0;
+
+  @ManyToOne(type => question_table, Question_table => Question_table.results)
+  @JoinColumn({ name: 'question_id' })
+  Question_table: question_table;
 
   // @Column()
   // Created_at: Timestamp;

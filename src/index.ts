@@ -7,7 +7,8 @@ const app = express();
 
 createConnection()
   .then((connection) => {
-    console.log("DB connect");
+    const jaDate = new Date().toLocaleString('ja-JP')
+    console.log(jaDate + " in Japan.DB connect");
     app.use(express.json());
 
     app.get("/getQuestion", async function (req: Request, res: Response) {
@@ -35,6 +36,23 @@ createConnection()
         }
       } catch (err) {
         err.statusCode = 400;
+        return res(err);
+      }
+    });
+
+    app.get("/getResult", async function (req: Request, res: Response) {
+      const questionRepository = connection.getRepository(question_table);
+      const countsRepository = connection.getRepository(status_counts);
+      try {
+        const resultData = await questionRepository.find({ relations: ["results"] });
+
+          console.log("2")
+        res.header({ "Content-Type": "application/json" });
+        res.json(resultData);
+      } catch (err) {
+        res.json("指定されたIDはありませんでした。");
+        err.statusCode = 400;
+        console.log(err.stack)
         return res(err);
       }
     });
@@ -110,3 +128,8 @@ createConnection()
 //   .orderBy(status_counts.question_id,"ASC")
 //   .getMany()
 //   .catch(e => console.error("error connecting: " + e.stack));
+
+// 何故か10飛びでインサートされるのでインクリメントを設定している。DB側で設定したいので要修正
+// set @@auto_increment_offset=1;
+// set @@auto_increment_increment=1;
+// SHOW VARIABLES LIKE 'auto_inc%';
