@@ -1,8 +1,8 @@
 import express from "express";
 import { Request, Response } from "express";
 import { createConnection, createQueryBuilder } from "typeorm";
-import { question_table } from "./entity/question_table";
-import { status_counts } from "./entity/status_counts";
+import { QuestionTable } from "./entity/QuestionTable";
+import { StatusCounts } from "./entity/StatusCounts";
 const app = express();
 
 createConnection()
@@ -12,7 +12,7 @@ createConnection()
     app.use(express.json());
 
     app.get("/getQuestion", async function (req: Request, res: Response) {
-      const questionRepository = connection.getRepository(question_table);
+      const questionRepository = connection.getRepository(QuestionTable);
       try {
         const fullData = await questionRepository.find();
         const maxDataLength = fullData.length;
@@ -41,14 +41,14 @@ createConnection()
     });
 
     app.get("/getResult", async function (req: Request, res: Response) {
-      const questionRepository = connection.getRepository(question_table);
-      const countsRepository = connection.getRepository(status_counts);
+      const questionRepository = connection.getRepository(QuestionTable);
+      const countsRepository = connection.getRepository(StatusCounts);
       try {
-        const resultData = await questionRepository.find({ relations: ["results"] });
+        const resultData = await questionRepository.find({ relations: ["statusCounts"] });
 
           console.log("2")
         res.header({ "Content-Type": "application/json" });
-        res.json(resultData);
+        return res.json(resultData);
       } catch (err) {
         res.json("指定されたIDはありませんでした。");
         err.statusCode = 400;
@@ -59,14 +59,14 @@ createConnection()
 
     app.get("/getSoFarResults", async function (req: Request, res: Response) {
       try {
-        const countsRepository = connection.getRepository(status_counts);
+        const countsRepository = connection.getRepository(StatusCounts);
         const qIdArray = req.query.qId;
         let reqJson = [];
 
         const carvingDatas = [];
         for (let qIdArray_i = 0; qIdArray_i <= 9; qIdArray_i++) {
           const loadedCounts = await countsRepository.find({
-            question_id: qIdArray[qIdArray_i],
+            questionId: qIdArray[qIdArray_i],
           });
           let trueSum = loadedCounts.filter(
             (DataObjRecord) => DataObjRecord.status === 1
@@ -91,17 +91,17 @@ createConnection()
     app.post("/sendResult", async function (req: Request, res: Response) {
       try {
         const reqData = JSON.parse(JSON.stringify(req.body));
-        const countsRepository = connection.getRepository(status_counts);
+        const countsRepository = connection.getRepository(StatusCounts);
         const fullData = await countsRepository.find();
         let addId = fullData.slice(-1)[0].id + 1;
         console.log("OK");
 
         let insertValues = [];
         for (let reqDataCount_i = 0; reqDataCount_i <= 9; reqDataCount_i++) {
-          let tmpValue = new status_counts();
+          let tmpValue = new StatusCounts();
           tmpValue.id = addId;
           addId += 1;
-          tmpValue.question_id = reqData[reqDataCount_i].question_id;
+          tmpValue.questionId = reqData[reqDataCount_i].questionId;
           tmpValue.status = reqData[reqDataCount_i].status;
           insertValues.push(tmpValue);
         }
@@ -117,15 +117,15 @@ createConnection()
     });
 
     // start express server
-    app.listen(5000);
+    app.listen(8080);
   })
   .catch((err) => console.log(err));
 
 // これを使ってFilterメソッドで絞り込めないか？
 // const loadedAllcounts = await countsRepository
-//   .createQueryBuilder("status_counts")
-//   .where("status_counts.question_id IN (:...question_ids)", { question_ids: qIdArray })
-//   .orderBy(status_counts.question_id,"ASC")
+//   .createQueryBuilder("StatusCounts")
+//   .where("StatusCounts.questionId IN (:...questionIds)", { questionIds: qIdArray })
+//   .orderBy(StatusCounts.questionId,"ASC")
 //   .getMany()
 //   .catch(e => console.error("error connecting: " + e.stack));
 
